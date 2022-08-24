@@ -66,7 +66,15 @@ app.post('/scream', (req, res) => {
   })
 })
 
-
+// Create Sign Up route
+app.post('/signup', (req, res) => {
+  const newUser = {
+    email: req.body.email,
+    password: req.body.password,
+    confirmPassword: req.body.confirmPassword,
+    handle: req.body.handle
+  }
+})
 
 // https://baseurl.com/api/
 
