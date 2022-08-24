@@ -1,10 +1,24 @@
 const functions = require("firebase-functions");
 const admin = require('firebase-admin');
+const express = require('express');
+const app = express();
 
 admin.initializeApp();
 
-const express = require('express')
-const app = express()
+
+
+const config = {
+  apiKey: "AIzaSyDEi-vqRMHtm2zx8FZ31gumSCyN6QlkPlc",
+  authDomain: "socialape-417c5.firebaseapp.com",
+  projectId: "socialape-417c5",
+  storageBucket: "socialape-417c5.appspot.com",
+  messagingSenderId: "158940384440",
+  appId: "1:158940384440:web:a8737cb5faa05b919bf84d",
+  measurementId: "G-NR7H6YH8HR"
+};
+
+const firebase = require('firebase');
+firebase.initializeApp(config);
 
 app.get('/screams', (req, res) => {
     admin
