@@ -1,9 +1,12 @@
 const functions = require("firebase-functions");
+
 const admin = require('firebase-admin');
+admin.initializeApp();
+
 const express = require('express');
 const app = express();
 
-admin.initializeApp();
+const firebase = require('firebase/app');
 
 
 
@@ -17,8 +20,11 @@ const config = {
   measurementId: "G-NR7H6YH8HR"
 };
 
-const firebase = require('firebase');
+
 firebase.initializeApp(config);
+
+const { getAuth, createUserWithEmailAndPassword } = require("firebase/auth");
+const auth = getAuth()
 
 app.get('/screams', (req, res) => {
     admin
@@ -74,6 +80,17 @@ app.post('/signup', (req, res) => {
     confirmPassword: req.body.confirmPassword,
     handle: req.body.handle
   }
+
+  // TODO: validate data
+
+  createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
+    .then(data => {
+      return res.status(201).json({ message: `user ${data.user.uid} signed up successfully`})
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code});
+    })
 })
 
 // https://baseurl.com/api/
