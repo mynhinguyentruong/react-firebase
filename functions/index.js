@@ -7,7 +7,12 @@ const express = require('express')
 const app = express()
 
 app.get('/screams', (req, res) => {
-    admin.firestore().collection('screams').get().then(data => {
+    admin
+    .firestore()
+    .collection('screams')
+    .orderBy('createdAt', 'desc')
+    .get()
+    .then(data => {
       let screams = []
       data.forEach(doc => {
         screams.push({
@@ -35,7 +40,7 @@ app.post('/scream', (req, res) => {
   const newScream = {
     body: req.body.body,
     userHandle: req.body.userHandle, 
-    createdAt: admin.firestore.Timestamp.fromDate(new Date())
+    createdAt: new Date().toISOString()
   }
 
   admin.firestore().collection('screams').add(newScream).then(doc => {
