@@ -23,7 +23,7 @@ const config = {
 
 firebase.initializeApp(config);
 
-const { getAuth, createUserWithEmailAndPassword } = require("firebase/auth");
+const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } = require("firebase/auth");
 const auth = getAuth()
 
 app.get('/screams', (req, res) => {
@@ -133,6 +133,21 @@ app.post('/signup', (req, res) => {
     })
 })
 
-// https://baseurl.com/api/
+app.post('/login', (req, res) => {
+  signInWithEmailAndPassword(auth, req.body.email, req.body.password)
+    .then(userCredentials => {
+      const user = userCredentials.user;
+      return userCredentials.user.getIdToken();
+    })
+    .then(token => res.json({token}))
+    .catch(err => {
+      console.error(err);
+      if (err.code === 'auth/wrong-password') {
+        return res.status(403).json({ general: "Wrong credentials, please try again"})
+      }
+      return res.status(500).json({ error: err.code})
+    })
+})
 
+// https://baseurl.com/api/
 exports.api = functions.https.onRequest(app)
