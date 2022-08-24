@@ -10,7 +10,10 @@ app.get('/screams', (req, res) => {
     admin.firestore().collection('screams').get().then(data => {
       let screams = []
       data.forEach(doc => {
-        screams.push(doc.data())
+        screams.push({
+          screamId: doc.id,
+          ...doc.data()
+        })
       })
       return res.json(screams)
     })
