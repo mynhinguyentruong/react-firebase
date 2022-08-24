@@ -72,6 +72,17 @@ app.post('/scream', (req, res) => {
   })
 })
 
+function isEmpty(string) {
+  if (string.trim() === '') return true;
+  return false;
+}
+
+function isEmail(email) {
+  const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  if (email.match(regEx)) return true;
+  return false;
+}
+
 // Create Sign Up route
 app.post('/signup', (req, res) => {
   const newUser = {
@@ -79,16 +90,34 @@ app.post('/signup', (req, res) => {
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
     handle: req.body.handle
-  }
+  };
 
+  let errors = {};
+
+  if (isEmpty(newUser.email)) errors.email = 'Email must not be enpty'
+  if (!isEmail(newUser.email)) errors.email = 'Must be valid'
+  let token, userId;
   // TODO: validate data
-
   createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
     .then(data => {
-      return res.status(201).json({ message: `user ${data.user.uid} signed up successfully`})
+      userId = data.user.uid;
+      return data.user.getIdToken();
     })
+    .then(idToken => {
+      token = idToken;
+      const userCredentials = {
+        ...newUser,
+        createdAt: new Date().toISOString(),
+        userId
+      };
+      return admin.firestore().doc(`/users/${newUser.handle}`).set(userCredentials);
+    })
+    .then(() => res.status(201).json({ token }))
     .catch(err => {
       console.error(err);
+      if (err.code === 'auth/email-already-in-use') {
+        return res.status(400).json({ email: 'Email is already in use'})
+      }
       return res.status(500).json({ error: err.code});
     })
 })
