@@ -6,26 +6,29 @@ admin.initializeApp();
 const express = require('express')
 const app = express()
 
+app.get('/screams', (req, res) => {
+    admin.firestore().collection('screams').get().then(data => {
+      let screams = []
+      data.forEach(doc => {
+        screams.push(doc.data())
+      })
+      return res.json(screams)
+    })
+    .catch(err => console.log(err)) 
+
+})
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
-exports.helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", {structuredData: true});
-  response.send("Hello from Firebase!");
-});
 
-exports.getScreams = functions.https.onRequest((req, res) => {
-  admin.firestore().collection('screams').get().then(data => {
-    let screams = []
-    data.forEach(doc => {
-      screams.push(doc.data())
-    })
-    return res.json(screams)
-  })
-  .catch(err => console.log(err)) 
-})
+// app.listen(8000)
 
-exports.createScreams = functions.https.onRequest((req, res) => {
+// exports.helloWorld = functions.https.onRequest((request, response) => {
+//   functions.logger.info("Hello logs!", {structuredData: true});
+//   response.send("Hello from Firebase!");
+// });
+
+app.post('/scream', (req, res) => {
   if (req.method !== 'POST') {
     return res.status(400).json({ error: "Method not allowed. Change the request to use POST method"})
   }
@@ -43,3 +46,9 @@ exports.createScreams = functions.https.onRequest((req, res) => {
     })
   })
 })
+
+
+
+// https://baseurl.com/api/
+
+exports.api = functions.https.onRequest(app)
