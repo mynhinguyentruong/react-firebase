@@ -73,11 +73,11 @@ function FBAuth(req, res, next) {
       return admin.firestore().collection('users')
         .where('userId', '==', req.user.uid)
         .limit(1)
-        .get()
+        .get();
     })
     .then(data => {
       req.user.handle = data.docs[0].data().handle;
-      return next()
+      return next();
     })
     .catch(err => {
       console.error('Error while verifying token', err);
@@ -90,7 +90,7 @@ function FBAuth(req, res, next) {
 app.post('/scream',FBAuth, (req, res) => {
   const newScream = {
     body: req.body.body,
-    userHandle: req.body.userHandle, 
+    userHandle: req.user.handle, 
     createdAt: new Date().toISOString()
   }
 
