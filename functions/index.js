@@ -1,10 +1,12 @@
 const functions = require("firebase-functions");
 
-const admin = require('firebase-admin');
-admin.initializeApp();
-
 const express = require('express');
 const app = express();
+
+const { admin } = require('./utils/admin')
+
+
+const { getAllScreams, postOneScream } = require('./handlers/screams')
 
 const firebase = require('firebase/app');
 
@@ -26,25 +28,10 @@ firebase.initializeApp(config);
 const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } = require("firebase/auth");
 const auth = getAuth()
 
-app.get('/screams', (req, res) => {
-    admin
-    .firestore()
-    .collection('screams')
-    .orderBy('createdAt', 'desc')
-    .get()
-    .then(data => {
-      let screams = []
-      data.forEach(doc => {
-        screams.push({
-          screamId: doc.id,
-          ...doc.data()
-        })
-      })
-      return res.json(screams)
-    })
-    .catch(err => console.log(err)) 
+// Scream routes
+app.get('/screams', getAllScreams);
+app.post('/scream',FBAuth, postOneScream)
 
-})
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
@@ -63,7 +50,7 @@ function FBAuth(req, res, next) {
     idToken = req.headers.authorization.split('Bearer ')[1];
   } else {
     console.error('No token found')
-    return res.status(403).json({ error: 'Unauthorized' })
+    return res.status(403).json({ error: 'You must provide a valid token' })
   }
 
   admin.auth().verifyIdToken(idToken)
@@ -87,21 +74,7 @@ function FBAuth(req, res, next) {
 
 
 // Post one scream
-app.post('/scream',FBAuth, (req, res) => {
-  const newScream = {
-    body: req.body.body,
-    userHandle: req.user.handle, 
-    createdAt: new Date().toISOString()
-  }
 
-  admin.firestore().collection('screams').add(newScream).then(doc => {
-    res.json({message: `document ${doc.id} created successfully`})
-    .catch(err => {
-      res.status(500).json({error: 'something went wrong'})
-      console.error(err)
-    })
-  })
-})
 
 function isEmpty(string) {
   if (string.trim() === '') return true;
