@@ -7,7 +7,7 @@ const { admin } = require('./utils/admin')
 
 
 const { getAllScreams, postOneScream } = require('./handlers/screams')
-const { uploadImage } = require('./handlers/users')
+const { uploadImage, addUserDetails } = require('./handlers/users')
 
 const firebase = require('firebase/app');
 
@@ -157,6 +157,7 @@ app.post('/login', (req, res) => {
     })
 })
 
+app.post('/user', FBAuth, addUserDetails)
 app.post('/user/image', FBAuth, uploadImage)
 
 // https://baseurl.com/api/

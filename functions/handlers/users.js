@@ -1,6 +1,8 @@
 const busboy = require('busboy');
 const { db, admin } = require('../utils/admin')
 
+const { reduceUserDetails } = require('../utils/validators')
+
 // const { getAuth, createUserWithEmailAndPassword } = require("firebase/auth");
 // const auth = getAuth()
 
@@ -53,6 +55,21 @@ const { db, admin } = require('../utils/admin')
 //     })
 // }
 
+
+
+// Add user details
+exports.addUserDetails = (req, res) => {
+  let userDetails = reduceUserDetails(req.body);
+
+  db.doc(`users/${req.user.handle}`).update(userDetails)
+    .then(() => res.json({ message: "User details added successfully"}))
+    .catch(err => {
+      console.error(err);
+      return  res.status(500).json({ error: err.code })
+    })
+}
+
+// Upload a profile image for user
 exports.uploadImage = (req, res) => {
   // const BusBoy = require('busboy');
   const path = require('path');
