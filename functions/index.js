@@ -124,7 +124,8 @@ app.post('/signup', (req, res) => {
     .then(idToken => {
       token = idToken;
       const userCredentials = {
-        ...newUser,
+        handle: newUser.handle,
+        email: newUser.email,
         createdAt: new Date().toISOString(),
         imageUrl: `https://firebasestorage.googleapis.com/v0/b/socialape-417c5.appspot.com/o/${noImg}?alt=media`,
         userId
