@@ -7,6 +7,7 @@ const { admin } = require('./utils/admin')
 
 
 const { getAllScreams, postOneScream } = require('./handlers/screams')
+const { uploadImage } = require('./handlers/users')
 
 const firebase = require('firebase/app');
 
@@ -96,6 +97,8 @@ app.post('/signup', (req, res) => {
     handle: req.body.handle
   };
 
+  const noImg = `no-img.png`;
+
   let errors = {};
 
   if (isEmpty(newUser.email)) {
@@ -123,6 +126,7 @@ app.post('/signup', (req, res) => {
       const userCredentials = {
         ...newUser,
         createdAt: new Date().toISOString(),
+        imageUrl: `https://firebasestorage.googleapis.com/v0/b/socialape-417c5.appspot.com/o/${noImg}?alt=media`,
         userId
       };
       return admin.firestore().doc(`/users/${newUser.handle}`).set(userCredentials);
@@ -152,6 +156,8 @@ app.post('/login', (req, res) => {
       return res.status(500).json({ error: err.code})
     })
 })
+
+app.post('/user/image', FBAuth, uploadImage)
 
 // https://baseurl.com/api/
 exports.api = functions.https.onRequest(app)
