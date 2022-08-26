@@ -6,7 +6,7 @@ const app = express();
 const { admin } = require('./utils/admin')
 
 
-const { getAllScreams, postOneScream, getScream, commentOnScream } = require('./handlers/screams')
+const { getAllScreams, postOneScream, getScream, commentOnScream, likeScream, unlikeScream } = require('./handlers/screams')
 const { uploadImage, addUserDetails, getAuthenticatedUser } = require('./handlers/users')
 
 const firebase = require('firebase/app');
@@ -34,9 +34,8 @@ app.get('/screams', getAllScreams);
 app.post('/scream',FBAuth, postOneScream);
 app.get('/scream/:screamId', getScream);
 /* TODO: delete scream */
-/* TODO: like scream */
-/* TODO: unlike scream */
-/* TODO: comment scream */
+app.get('/scream/:screamId/like', FBAuth, likeScream)
+app.get('/scream/:screamId/unlike', FBAuth, unlikeScream)
 app.post('/scream/:screamId', FBAuth, commentOnScream)
 
 // // Create and Deploy Your First Cloud Functions
