@@ -157,3 +157,23 @@ exports.unlikeScream = (req, res) => {
       return res.status(500).json({ error: err.code})
     })
 }
+
+exports.deleteScream = (req, res) => {
+  //if it is the same user
+  const document = db.doc(`/screams/${req.params.screamId}`);
+
+  document
+    .get()
+    .then(doc => {
+      if (!doc.exists) return res.status(404).json({ error: 'Scream does not exist'});
+
+      if (doc.data().userHandle !== req.user.handle) return res.status(403).json({ error: 'You are not authorized to delete this scream'});
+
+      return document.delete();
+    })
+    .then(() => res.json({ message: 'Scream deleted successfully' }))
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code })
+    })
+}
