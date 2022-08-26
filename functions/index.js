@@ -3,7 +3,7 @@ const functions = require("firebase-functions");
 const express = require('express');
 const app = express();
 
-const { admin } = require('./utils/admin')
+const { db, admin } = require('./utils/admin')
 
 
 const { getAllScreams, postOneScream, getScream, commentOnScream, likeScream, unlikeScream, deleteScream } = require('./handlers/screams')
@@ -173,3 +173,57 @@ app.get('/user', FBAuth, getAuthenticatedUser)
 
 // https://baseurl.com/api/
 exports.api = functions.https.onRequest(app)
+
+exports.deleteNotificationOnUnlike = functions.firestore.document('likes/{docId}')
+  .onDelete(snapshot => {
+    return db
+      .doc(`/notifications/${snapshot.id}`)
+      .delete()
+      .catch(err => {
+        console.error(err);
+        return;
+      })
+      
+  })
+
+exports.createNotificationOnLike = functions.firestore.document('likes/{docId}')
+  .onCreate(snapshot => {
+    db.doc(`/screams/${snapshot.data().screamId}`).get()
+      .then(doc => {
+        if(doc.exists) {
+          return db.doc(`/notifications/${snapshot.id}`).set({
+              createdAt: new Date().toISOString(),
+              recipient: doc.data().userHandle,
+              sender: snapshot.data().userHandle,
+              type:  'like',
+              read: false,
+              screamId: doc.id
+        })}
+        return;
+      })
+      .catch(err => {
+        console.error(err);
+        return;
+      })
+  })
+
+exports.createNotificationOnComment = functions.firestore.document('comments/{docId}')
+  .onCreate(snapshot => {
+    db.doc(`/screams/${snapshot.data().screamId}`).get()
+      .then(doc => {
+        if(doc.exists) {
+          return db.doc(`/notifications/${snapshot.id}`).set({
+              createdAt: new Date().toISOString(),
+              recipient: doc.data().userHandle,
+              sender: snapshot.data().userHandle,
+              type:  'comment',
+              read: false,
+              screamId: doc.id
+        })}
+        return;
+      })
+      .catch(err => {
+        console.error(err);
+        return;
+      })
+  })
