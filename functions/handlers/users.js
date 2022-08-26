@@ -105,6 +105,32 @@ exports.getAuthenticatedUser = (req, res) => {
     })
 }
 
+//Get any user's details
+exports.getUserDetails = (req, res) => {
+  let userData = {};
+  db.doc(`/users/${req.params.handle}`).get()
+    .then(doc => {
+      if (doc.exists) {
+        userData = doc.data();
+        return db.collection('screams').where('userHandle', '==', req.params.handle)
+          .orderBy('createdAt', 'desc')
+          .get()
+      } else return res.status(404).json({ error: 'User not found' })
+    })
+    .then(data => {
+      userData.screams = [];
+      data.forEach(doc => userData.screams.push({
+        ...doc.data(),
+        screamId: doc.id
+      }))
+      return res.json(userData);
+    })
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    })
+}
+
 // Upload a profile image for user
 exports.uploadImage = (req, res) => {
   // const BusBoy = require('busboy');
@@ -157,3 +183,5 @@ exports.uploadImage = (req, res) => {
   });
   bb.end(req.rawBody);
 }
+
+exports.markNotificationsRead = (req, res) => {}

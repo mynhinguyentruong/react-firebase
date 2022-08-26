@@ -7,7 +7,7 @@ const { db, admin } = require('./utils/admin')
 
 
 const { getAllScreams, postOneScream, getScream, commentOnScream, likeScream, unlikeScream, deleteScream } = require('./handlers/screams')
-const { uploadImage, addUserDetails, getAuthenticatedUser } = require('./handlers/users')
+const { uploadImage, addUserDetails, getAuthenticatedUser, getUserDetails, markNotificationsRead } = require('./handlers/users')
 
 const firebase = require('firebase/app');
 
@@ -166,10 +166,13 @@ app.post('/login', (req, res) => {
     })
 })
 
-app.post('/user', FBAuth, addUserDetails)
-app.post('/user/image', FBAuth, uploadImage)
+app.post('/user', FBAuth, addUserDetails);
+app.post('/user/image', FBAuth, uploadImage);
 
-app.get('/user', FBAuth, getAuthenticatedUser)
+app.get('/user', FBAuth, getAuthenticatedUser);
+app.get('/user/:handle', getUserDetails);
+
+app.post('/notifications', FBAuth, markNotificationsRead)
 
 // https://baseurl.com/api/
 exports.api = functions.https.onRequest(app)
