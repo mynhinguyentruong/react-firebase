@@ -6,7 +6,7 @@ const app = express();
 const { admin } = require('./utils/admin')
 
 
-const { getAllScreams, postOneScream, getScream } = require('./handlers/screams')
+const { getAllScreams, postOneScream, getScream, commentOnScream } = require('./handlers/screams')
 const { uploadImage, addUserDetails, getAuthenticatedUser } = require('./handlers/users')
 
 const firebase = require('firebase/app');
@@ -37,6 +37,7 @@ app.get('/scream/:screamId', getScream);
 /* TODO: like scream */
 /* TODO: unlike scream */
 /* TODO: comment scream */
+app.post('/scream/:screamId', FBAuth, commentOnScream)
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions

@@ -54,3 +54,8 @@ exports.postOneScream = (req, res) => {
     })
   })
 }
+
+exports.commentOnScream = (req, res) => {
+  //create comment
+  const comment = {}
+}
