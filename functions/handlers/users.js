@@ -184,4 +184,16 @@ exports.uploadImage = (req, res) => {
   bb.end(req.rawBody);
 }
 
-exports.markNotificationsRead = (req, res) => {}
+exports.markNotificationsRead = (req, res) => {
+  let batch = db.batch();
+  req.body.forEach(notifId => {
+    const notification = db.doc(`/notifications/${notifId}`);
+    batch.update(notification, { read: true });
+  });
+  batch.commit()
+    .then(() => res.json({ message: 'Notifications marked read'}))
+    .catch(err => {
+      console.error(err);
+      return res.status(500).json({ error: err.code })
+    })
+}
