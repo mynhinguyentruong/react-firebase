@@ -139,7 +139,7 @@ exports.uploadImage = (req, res) => {
   const fs = require('fs');
   const busboy = require('busboy');
   const bb = busboy({ headers: req.headers });
-
+  console.log(bb)
   // const busboy = new BusBoy({ headers: req. headers});
 
   let imageFileName;
@@ -147,12 +147,7 @@ exports.uploadImage = (req, res) => {
 
   bb.on('file', (name, file, info) => {
     const { filename, encoding, mimeType } = info;
-    if (mimeType !== 'image/jpeg' || mimeType !== 'image/png') {
-      return res.status(400).json({ error: 'Image must be jpeg or png format'})
-    }
-    console.log(filename);
-    console.log(mimeType);
-
+   
     const imageExtension = filename.split('.')[filename.split('.').length - 1];
     imageFileName = `${Math.round(Math.random()*1000000000000)}.${imageExtension}`;
     const filepath = path.join(os.tmpdir(), imageFileName);
